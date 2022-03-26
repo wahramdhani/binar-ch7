@@ -25,6 +25,12 @@ const createUser = async (req, res) => {
                 username: username
             },
         });
+        if (role !== 'SuperAdmin' && role !== 'PlayerUser') {
+            return res.status(400).json({
+                status: 'failed',
+                msg: 'role is not allowed'
+            })
+        }
         if (cekusername) {
             return res.status(400).json({
                 status: 'failed',
@@ -48,7 +54,7 @@ const createUser = async (req, res) => {
         catch (error) {
             res.status(400).json({
                 status: 'failed',
-                error: [err.message]
+                error: [error.message]
             })
         }
 };

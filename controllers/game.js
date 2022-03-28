@@ -1,9 +1,13 @@
+
 const {Room, gameHistories} = require('../models')
 
 const PAPER = "P"
 const SCISSORS = "S"
 const ROCK = "R"
 
+const WIN = "WIN"
+const LOSE = "LOSE"
+const DRAW = "DRAW"
 const GameCompleted = 3
 
 
@@ -77,6 +81,19 @@ const savePick = async (room, pick, p1, p2) => {
     }
 }
 
+const gameLogic = async (room, gameHistories,p1Pick, p2Pick, p1,p2) => {
+    const {id: roomId} = room
+
+    if(p1 && p1Pick == p2 && p2Pick) {
+        gameHistories.create({
+            user_id: {p1, p2},
+            room_id: roomId,
+            result: DRAW
+        })
+    }
+
+}
+
 const game = async (req, res) => {
     const {pick} = req.body
 
@@ -146,7 +163,7 @@ const game = async (req, res) => {
     } catch (error) {
         return res.json(error)
     }
-
+    
     const lastGame = await checkGameComplete(roomupdate)
     console.log('check this', lastGame);
 
@@ -154,6 +171,11 @@ const game = async (req, res) => {
         output = {
             roomId,
             msg: 'game is over'
+        }
+        const isGameLogic = await gameLogic(gameHistories)
+
+        if(isGameLogic) {
+            return res.json(`${result}`)
         }
     }
     return res.json(output)
